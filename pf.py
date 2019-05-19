@@ -5,6 +5,7 @@ DIMENSION = 2
 FACTORS = 2 # Position, velocity
 
 MODEL_SIGMA = 1
+ACCEL_DRIFT = 3
 # circular particle
 def signal_x(t):
     return numpy.stack((numpy.cos(t), numpy.sin(t)), 1)
@@ -16,7 +17,7 @@ def dynamics(particles, a, dt):
     p_x = particles[:,0,:]
     p_v = particles[:,1,:]
 
-    a_drift = a + numpy.random.normal(0, .1, size=p_x.shape)
+    a_drift = a + numpy.random.normal(0, ACCEL_DRIFT, size=p_x.shape)
     x_drift = .5 * a_drift * dt ** 2 + p_v * dt + p_x
     v_drift = a * dt + p_v
 
@@ -52,7 +53,7 @@ def particle_filter(n, control, measurements, truth, dt):
 draw.init()
 
 dt = .1
-t = numpy.arange(0,100, dt)
+t = numpy.arange(0,1000, dt)
 x = signal_x(t)
 a = signal_a(t)
 
