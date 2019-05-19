@@ -5,25 +5,6 @@ DIMENSION = 2
 FACTORS = 2 # Position, velocity
 
 MODEL_SIGMA = 1
-
-# this is setup to be one dimensional, but
-# nothing stops accel, xstart, and vstart from being vectors.
-def integrate(accel, xstart, vstart, dt):
-    x = [xstart]
-    xcur = xstart
-    vcur = vstart
-    for a in accel:
-        xcur = .5 * dt**2 * a + vcur * dt + xcur
-        vcur = dt * a + vcur
-        x.append(xcur)
-    return x
-
-def add_noise(accel):
-    noisy_accel = accel + numpy.random.normal(size=accel.size)
-    return noisy_accel
-
-
-# test data
 # circular particle
 def signal_x(t):
     return numpy.stack((numpy.cos(t), numpy.sin(t)), 1)
