@@ -33,10 +33,10 @@ def likelihood(particles, measurement, weights):
 def resample(particles, weights):
     return particles[numpy.random.choice(len(particles), len(particles), p=weights)]
 
-def particle_filter(n, control, measurements, dt):
+def particle_filter(n, control, measurements, truth, dt):
     p = numpy.random.uniform(-1, 1, size=(n, FACTORS, DIMENSION))
     w = 1.0/n  + numpy.zeros(n)
-    for u, m in zip(control, measurements):
+    for u, m, t in zip(control, measurements, truth):
         # Do dynamics
         drift_p = dynamics(p, u, dt)
         # compute weight based on measurements and existing weights
@@ -48,7 +48,7 @@ def particle_filter(n, control, measurements, dt):
         w = w / numpy.sum(w)
         # resample
         p = resample(drift_p, w)
-        draw.pyframe(p[:,0,:], m)
+        draw.pyframe(p[:,0,:], t)
 draw.init()
 
 dt = .1
@@ -56,4 +56,4 @@ t = numpy.arange(0,100, dt)
 x = signal_x(t)
 a = signal_a(t)
 
-particle_filter(20000, a, x + numpy.random.normal(0,.00, size=x.shape), dt)
+particle_filter(20000, a, x + numpy.random.normal(0,.1, size=x.shape), x, dt)
