@@ -4,14 +4,14 @@ import draw
 DIMENSION = 2
 FACTORS = 2 # Position, velocity
 
-MODEL_SIGMA = 1
-ACCEL_DRIFT = 1
+MODEL_SIGMA = .5
+ACCEL_DRIFT = 6
 # circular particle
 def signal_x(t):
-    return numpy.stack((numpy.cos(t), numpy.sin(t)), 1)
+    return numpy.stack((numpy.cos(t/2), numpy.sin(t/2)), 1)
 
 def signal_a(t):
-    return numpy.stack((-numpy.cos(t), -numpy.sin(t)), 1)
+    return numpy.stack((-(.5**2)*numpy.cos(t/2), -(.5**2)*numpy.sin(t/2)), 1)
 
 def dynamics(particles, a, dt):
     p_x = particles[:,0,:]
@@ -41,12 +41,13 @@ def likelihood(particles, measurement, weights):
 def resample(particles, weights):
     return particles[numpy.random.choice(len(particles), len(particles), p=weights)]
 
-def particle_filter(n, control, measurements, truth, dt):
+def particle_filter(n, control, measurements, truth, dt, dynamics):
     p = numpy.random.uniform(-1, 1, size=(n, FACTORS, DIMENSION))
+    p[:,0,:] # for verlet assume initially stationary.
     w = 1.0/n  + numpy.zeros(n)
     for u, m, t in zip(control, measurements, truth):
         # Do dynamics
-        drift_p = dynamics2(p, u, dt)
+        drift_p = dynamics(p, u, dt)
         # compute weight based on measurements and existing weights
         w = likelihood(drift_p, m, w)
         print(numpy.sum(w))
@@ -64,4 +65,4 @@ t = numpy.arange(0,1000, dt)
 x = signal_x(t)
 a = signal_a(t)
 
-particle_filter(20000, a, x + numpy.random.normal(0,.1, size=x.shape), x, dt)
+particle_filter(20000, a, x + numpy.random.normal(0,.1, size=x.shape), x, dt, dynamics)
