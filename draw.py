@@ -12,9 +12,10 @@ def init():
     pygame.init()
     screen = pygame.display.set_mode((800,800))
 
-def pyframe(points, truth):
+def pyframe(points, velocity, truth):
     screen.fill((0,0,0))
     plot(points, (255,0,0))
+    plot(velocity, (0,0,255))
     plot([truth], (0,255,0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
